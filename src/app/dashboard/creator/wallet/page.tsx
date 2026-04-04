@@ -1,3 +1,10 @@
+"use client";
+
+import { motion } from "framer-motion";
+import { Wallet, ArrowDownToLine, Lock, RotateCcw } from "lucide-react";
+import { creatorStats, mockCreatorTransactions } from "@/lib/mock-data";
+import { Button } from "@/components/ui/button";
+import { StatusBadge } from "@/components/dashboard/shared/status-badge";
 import { useTitle } from "@/lib/title-context";
 
 export default function WalletPage() {
