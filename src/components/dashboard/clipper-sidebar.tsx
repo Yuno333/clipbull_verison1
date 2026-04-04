@@ -18,6 +18,7 @@ import {
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
 
 const navItems = [
   { label: "Dashboard", href: "/dashboard/clipper", icon: LayoutDashboard },
@@ -31,23 +32,45 @@ const navItems = [
 
 export function ClipperSidebar() {
   const pathname = usePathname();
-  const [userEmail, setUserEmail] = useState<string>("Loading...");
-  const [userInitials, setUserInitials] = useState<string>("..");
-  const [userName, setUserName] = useState<string>("Loading...");
+  const router = useRouter();
+  const [userEmail, setUserEmail] = useState<string>("");
+  const [userInitials, setUserInitials] = useState<string>("");
+  const [userName, setUserName] = useState<string>("");
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+    const supabase = createClient();
+    
+    const updateUserInfo = (user: any) => {
       if (user) {
-        setUserEmail(user.email || "Unknown");
+        setUserEmail(user.email || "");
         const name = user.user_metadata?.username || user.user_metadata?.full_name || user.email?.split("@")[0] || "Clipper";
         setUserName(name);
         setUserInitials(name.substring(0, 2).toUpperCase());
+      } else {
+        setUserEmail("");
+        setUserName("");
+        setUserInitials("");
       }
     };
-    fetchUser();
+
+    // Initial fetch
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      updateUserInfo(user);
+    });
+
+    // Listen for changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      updateUserInfo(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
+
+  const handleSignOut = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/auth/login");
+  };
 
   return (
     <aside
@@ -132,7 +155,10 @@ export function ClipperSidebar() {
               <div className="text-[11px] text-zinc-600 truncate">{userEmail}</div>
             </div>
           </div>
-          <button className="w-full flex items-center gap-2 text-xs text-zinc-600 hover:text-zinc-400 transition-colors px-1 py-1 rounded-md hover:bg-white/[0.04] cursor-pointer">
+          <button 
+            onClick={handleSignOut}
+            className="w-full flex items-center gap-2 text-xs text-zinc-600 hover:text-zinc-400 transition-colors px-1 py-1 rounded-md hover:bg-white/[0.04] cursor-pointer"
+          >
             <LogOut size={13} />
             Sign out
           </button>
