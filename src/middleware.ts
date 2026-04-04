@@ -84,8 +84,15 @@ export async function middleware(request: NextRequest) {
   }
 
   // Enforce role separation for standard users
-  if (user && request.nextUrl.pathname.startsWith("/dashboard") && !request.nextUrl.pathname.startsWith("/dashboard/admin")) {
-    const role = user.user_metadata?.role || "creator";
+  if (user && request.nextUrl.pathname.startsWith("/dashboard")) {
+    const role = user.app_metadata?.role || user.user_metadata?.role || "creator";
+
+    // If an admin lands on a non-admin dashboard (like the default /dashboard), send them to admin
+    if (role === "admin" && !request.nextUrl.pathname.startsWith("/dashboard/admin")) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/dashboard/admin";
+      return NextResponse.redirect(url);
+    }
 
     // Prevent non-creators from accessing creator dashboard
     if (request.nextUrl.pathname.startsWith("/dashboard/creator") && role !== "creator") {
