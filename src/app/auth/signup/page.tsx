@@ -57,7 +57,7 @@ function SignUpForm() {
   const initialRole = searchParams.get("role") === "clipper" ? "clipper" : "creator";
 
   const [role, setRole] = useState<"creator" | "clipper">(initialRole);
-  const [fullName, setFullName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -77,8 +77,8 @@ function SignUpForm() {
     e.preventDefault();
     setError("");
 
-    if (!fullName.trim()) {
-      setError("Please enter your full name");
+    if (!username.trim()) {
+      setError("Please enter your username");
       return;
     }
     if (!email.trim()) {
@@ -106,7 +106,7 @@ function SignUpForm() {
         password,
         options: {
           data: {
-            full_name: fullName,
+            username: username,
             role: role,
           },
         },
@@ -200,21 +200,21 @@ function SignUpForm() {
           )}
 
           <form onSubmit={handleSignUp} className="space-y-5">
-            {/* Full Name */}
+            {/* Username */}
             <div>
               <label
-                htmlFor="fullName"
+                htmlFor="username"
                 className="block text-sm font-medium text-zinc-400 mb-2"
               >
-                Full Name
+                Username
               </label>
               <input
-                id="fullName"
+                id="username"
                 type="text"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 className="w-full h-12 px-4 rounded-xl bg-[#0a0a12] border border-white/[0.08] text-white placeholder-zinc-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/25 transition-all"
-                placeholder="John Doe"
+                placeholder="e.g. clipmaster99"
               />
             </div>
 

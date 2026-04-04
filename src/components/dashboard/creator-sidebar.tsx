@@ -16,6 +16,9 @@ import {
   Scissors,
 } from "lucide-react";
 
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+
 const navItems = [
   { label: "Dashboard", href: "/dashboard/creator", icon: LayoutDashboard },
   { label: "Create Campaign", href: "/dashboard/creator/campaigns/create", icon: PlusCircle },
@@ -28,6 +31,23 @@ const navItems = [
 
 export function CreatorSidebar() {
   const pathname = usePathname();
+  const [userEmail, setUserEmail] = useState<string>("Loading...");
+  const [userInitials, setUserInitials] = useState<string>("..");
+  const [userName, setUserName] = useState<string>("Loading...");
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUserEmail(user.email || "Unknown");
+        const name = user.user_metadata?.username || user.user_metadata?.full_name || user.email?.split("@")[0] || "Creator";
+        setUserName(name);
+        setUserInitials(name.substring(0, 2).toUpperCase());
+      }
+    };
+    fetchUser();
+  }, []);
 
   return (
     <aside
@@ -105,11 +125,11 @@ export function CreatorSidebar() {
         <div className="px-4 py-4 border-t border-white/[0.06]">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-orange-500 flex items-center justify-center text-xs font-bold text-white shrink-0">
-              AC
+              {userInitials}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium text-white truncate">Alex Creator</div>
-              <div className="text-[11px] text-zinc-600 truncate">creator@clipbull.io</div>
+              <div className="text-sm font-medium text-white truncate">{userName}</div>
+              <div className="text-[11px] text-zinc-600 truncate">{userEmail}</div>
             </div>
           </div>
           <button className="w-full flex items-center gap-2 text-xs text-zinc-600 hover:text-zinc-400 transition-colors px-1 py-1 rounded-md hover:bg-white/[0.04] cursor-pointer">

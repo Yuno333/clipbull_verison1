@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { ArrowRight, Eye, EyeOff } from "lucide-react";
+import { authenticateAdmin } from "@/lib/admin-actions";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -31,6 +32,14 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
+      // 1. Check if it's the Admin logging in
+      const adminAuth = await authenticateAdmin(email, password);
+      if (adminAuth.success) {
+        router.push("/dashboard/admin");
+        return;
+      }
+
+      // 2. Otherwise default to Supabase
       const supabase = createClient();
       const { data, error: loginError } =
         await supabase.auth.signInWithPassword({

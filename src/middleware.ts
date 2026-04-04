@@ -29,23 +29,55 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Protect dashboard routes - redirect to login if not authenticated
-  if (!user && request.nextUrl.pathname.startsWith("/dashboard")) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/auth/login";
-    return NextResponse.redirect(url);
+  const adminSession = request.cookies.get("clipbull_admin_session");
+
+  // Protect dashboard routes
+  if (request.nextUrl.pathname.startsWith("/dashboard")) {
+    // Special case for admin dashboard
+    if (request.nextUrl.pathname.startsWith("/dashboard/admin")) {
+      if (adminSession?.value === "verified") {
+        return supabaseResponse;
+      }
+      if (user && user.user_metadata?.role === "admin") {
+        return supabaseResponse;
+      }
+      // If neither admin cookie nor supabase admin user, redirect to login
+      const url = request.nextUrl.clone();
+      url.pathname = "/auth/login";
+      return NextResponse.redirect(url);
+    }
+
+    // General user protection
+    if (!user) {
+      if (adminSession?.value === "verified") {
+        // Admin trying to access non-admin dashboard? Redirect to admin dashboard.
+        const url = request.nextUrl.clone();
+        url.pathname = "/dashboard/admin";
+        return NextResponse.redirect(url);
+      }
+      const url = request.nextUrl.clone();
+      url.pathname = "/auth/login";
+      return NextResponse.redirect(url);
+    }
   }
 
-  // Redirect authenticated users away from auth pages to their dashboard
-  if (user && request.nextUrl.pathname.startsWith("/auth")) {
-    const url = request.nextUrl.clone();
-    const role = user.user_metadata?.role || "creator";
-    url.pathname = `/dashboard/${role}`;
-    return NextResponse.redirect(url);
+  // Redirect authenticated users away from auth pages
+  if (request.nextUrl.pathname.startsWith("/auth")) {
+    if (adminSession?.value === "verified") {
+      const url = request.nextUrl.clone();
+      url.pathname = "/dashboard/admin";
+      return NextResponse.redirect(url);
+    }
+    if (user) {
+      const url = request.nextUrl.clone();
+      const role = user.user_metadata?.role || "creator";
+      url.pathname = `/dashboard/${role}`;
+      return NextResponse.redirect(url);
+    }
   }
 
-  // Enforce role separation within dashboard
-  if (user && request.nextUrl.pathname.startsWith("/dashboard")) {
+  // Enforce role separation for standard users
+  if (user && request.nextUrl.pathname.startsWith("/dashboard") && !request.nextUrl.pathname.startsWith("/dashboard/admin")) {
     const role = user.user_metadata?.role || "creator";
 
     // Prevent non-creators from accessing creator dashboard
@@ -57,13 +89,6 @@ export async function middleware(request: NextRequest) {
 
     // Prevent non-clippers from accessing clipper dashboard
     if (request.nextUrl.pathname.startsWith("/dashboard/clipper") && role !== "clipper") {
-      const url = request.nextUrl.clone();
-      url.pathname = `/dashboard/${role}`;
-      return NextResponse.redirect(url);
-    }
-
-    // Prevent non-admins from accessing admin dashboard
-    if (request.nextUrl.pathname.startsWith("/dashboard/admin") && role !== "admin") {
       const url = request.nextUrl.clone();
       url.pathname = `/dashboard/${role}`;
       return NextResponse.redirect(url);
