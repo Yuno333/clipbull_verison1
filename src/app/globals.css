@@ -30,11 +30,19 @@
   --input: #27272a;
   --ring: #7C3AED;
 
-  --radius: 0.5rem;
+  --radius: 0.75rem;
 
   /* Dashboard tokens */
   --sidebar-width: 260px;
-  --topbar-height: 60px;
+  --topbar-height: 64px;
+  
+  /* Antigravity Tokens */
+  --glass-bg: rgba(10, 10, 15, 0.45);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  --spatial-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.5), 0 18px 36px -18px rgba(0, 0, 0, 0.5);
+  
+  /* Status colors */
   --status-active: #10B981;
   --status-paused: #F59E0B;
   --status-pending: #3B82F6;
@@ -63,17 +71,19 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
 
+  --radius-xl: 1rem;
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
 
   --font-sans: var(--font-inter);
+
+  --shadow-spatial: var(--spatial-shadow);
+  --shadow-weightless: var(--glass-shadow);
 
   --animate-marquee: marquee 30s linear infinite;
   --animate-float: float 6s ease-in-out infinite;
@@ -93,6 +103,19 @@
     0%, 100% { opacity: 0.3; }
     50% { opacity: 0.6; }
   }
+}
+
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+}
+
+.glass-morphism {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 100%);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
 body {
@@ -122,4 +145,14 @@ input[type="email"],
 input[type="password"],
 input[type="text"] {
   color-scheme: dark;
+}
+
+/* Antigravity specific transitions */
+.antigravity-hover {
+  transition: all 0.4s cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.antigravity-hover:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: var(--spatial-shadow);
 }
