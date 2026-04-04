@@ -14,7 +14,10 @@ const mockUsers = [
   { id: "5", name: "Emma Thompson", email: "emma@creator.com", role: "creator", status: "active", joined: "2024-03-22" },
 ];
 
+import { useTitle } from "@/lib/title-context";
+
 export default function UsersPage() {
+  useTitle("User Management", "Manage all creators and clippers on the platform.");
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState<"all" | "creator" | "clipper">("all");
 
@@ -33,11 +36,11 @@ export default function UsersPage() {
         transition={{ duration: 0.5 }}
       >
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-          <div>
+          <div className="opacity-0 h-0 overflow-hidden absolute">
             <h1 className="text-3xl font-bold text-white tracking-tight mb-2">User Management</h1>
             <p className="text-zinc-400 text-sm">Manage all creators and clippers on the platform.</p>
           </div>
-          <Button className="bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl h-11 px-6 font-semibold shadow-[0_0_20px_rgba(6,182,212,0.3)] gap-2">
+          <Button className="bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl h-11 px-6 font-semibold shadow-[0_0_20px_rgba(6,182,212,0.3)] gap-2 ml-auto">
             <UserPlus size={18} />
             Add User
           </Button>

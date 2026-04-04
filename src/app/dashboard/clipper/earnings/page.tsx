@@ -1,22 +1,25 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Topbar } from "@/components/dashboard/shared/topbar";
-import { PageHeader } from "@/components/dashboard/shared/page-header";
 import { StatusBadge } from "@/components/dashboard/shared/status-badge";
 import { mockClipperTransactions, clipperStats } from "@/lib/mock-data";
 import { Wallet, TrendingUp, Clock, ArrowUpToLine } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTitle } from "@/lib/title-context";
 
 export default function EarningsPage() {
+  useTitle("Earnings & Wallet", "Track your earnings and manage payouts");
+
   return (
     <div className="flex flex-col min-h-screen">
-      <Topbar title="Earnings & Wallet" />
       <main className="flex-1 p-6 space-y-8">
-        <PageHeader title="Earnings & Wallet" subtitle="Track your earnings and manage payouts" />
+        <div className="opacity-0 h-0 overflow-hidden absolute">
+          <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Earnings & Wallet</h1>
+          <p className="text-zinc-400 text-sm">Track your earnings and manage payouts</p>
+        </div>
 
         {/* Wallet Summary */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[
             { icon: Wallet, label: "Available Balance", value: clipperStats.availableBalance, color: "text-primary", bg: "bg-primary/10", border: "border-primary/20" },
             { icon: Clock, label: "Pending Earnings", value: clipperStats.pendingEarnings, color: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/20" },
@@ -49,7 +52,7 @@ export default function EarningsPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <Button className="bg-primary hover:bg-primary/90 text-white rounded-xl px-8 gap-2 shadow-[0_0_20px_rgba(255,79,0,0.3)]">
+          <Button className="bg-primary hover:bg-primary/90 text-white rounded-xl px-8 gap-2 shadow-[0_0_20px_rgba(255,79,0,0.3)] w-full sm:w-auto">
             <ArrowUpToLine size={15} />
             Request Payout
           </Button>
@@ -63,8 +66,8 @@ export default function EarningsPage() {
           transition={{ delay: 0.25 }}
         >
           <h2 className="text-sm font-semibold text-white mb-4">Transaction History</h2>
-          <div className="bg-[#0a0a0a] border border-white/6 rounded-2xl overflow-hidden">
-            <table className="w-full text-sm">
+          <div className="bg-[#0a0a0a] border border-white/6 rounded-2xl overflow-hidden overflow-x-auto">
+            <table className="w-full text-sm min-w-[500px]">
               <thead>
                 <tr className="border-b border-white/5">
                   {["Date", "Campaign / Description", "Amount", "Status"].map((h) => (

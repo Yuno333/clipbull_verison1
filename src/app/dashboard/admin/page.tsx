@@ -2,8 +2,11 @@
 
 import { motion } from "framer-motion";
 import { Users, Megaphone, AlertTriangle, TrendingUp, ShieldCheck } from "lucide-react";
+import { useTitle } from "@/lib/title-context";
 
 export default function AdminDashboard() {
+  useTitle("Platform Overview", "Welcome to the ClipBull Administration Console.");
+
   return (
     <div className="p-8 pb-20">
       <motion.div
@@ -11,18 +14,13 @@ export default function AdminDashboard() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Platform Overview</h1>
-        <p className="text-zinc-400 text-sm mb-8">
-          Welcome to the ClipBull Administration Console.
-        </p>
-
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {[
             { label: "Total Users", value: "1,248", change: "+12%", icon: Users, color: "text-blue-400", bg: "bg-blue-500/10" },
             { label: "Active Campaigns", value: "45", change: "+5%", icon: Megaphone, color: "text-emerald-400", bg: "bg-emerald-500/10" },
             { label: "Pending Disputes", value: "3", change: "-2", icon: AlertTriangle, color: "text-rose-400", bg: "bg-rose-500/10", changeColor: "text-emerald-400", changeBg: "bg-emerald-500/10" },
-            { label: "Total Revenue", value: "$12,450", change: "+18%", icon: TrendingUp, color: "text-cyan-400", bg: "bg-cyan-500/10" },
+            { label: "Total Revenue", value: "₦12,450", change: "+18%", icon: TrendingUp, color: "text-cyan-400", bg: "bg-cyan-500/10" },
           ].map((stat, i) => (
             <motion.div
               key={i}

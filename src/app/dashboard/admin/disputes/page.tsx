@@ -11,7 +11,11 @@ const mockDisputes = [
   { id: "104", reporter: "Tech Reviewer", target: "Clipper_X", reason: "Policy Violation", priority: "high", status: "open", date: "10 mins ago" },
 ];
 
+import { useTitle } from "@/lib/title-context";
+
 export default function DisputesPage() {
+  useTitle("Resolution Center", "Review and resolve disputes between creators and clippers.");
+
   return (
     <div className="p-8 pb-20">
       <motion.div
@@ -19,7 +23,7 @@ export default function DisputesPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="mb-10">
+        <div className="opacity-0 h-0 overflow-hidden absolute">
           <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Resolution Center</h1>
           <p className="text-zinc-400 text-sm">Review and resolve disputes between creators and clippers.</p>
         </div>

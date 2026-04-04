@@ -4,18 +4,22 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { KpiCard } from "@/components/dashboard/shared/kpi-card";
 import { StatusBadge } from "@/components/dashboard/shared/status-badge";
-import { Topbar } from "@/components/dashboard/shared/topbar";
 import { mockClipperCampaigns, clipperStats } from "@/lib/mock-data";
 import { Megaphone, DollarSign, TrendingUp, Wallet, ArrowRight } from "lucide-react";
+import { useTitle } from "@/lib/title-context";
 
 export default function ClipperDashboard() {
+  useTitle("Dashboard", "Welcome back, TikiMaster_NG 🎬");
   const active = mockClipperCampaigns.filter((c) => c.status === "Active");
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Topbar title="Dashboard" subtitle="Welcome back, TikiMaster_NG 🎬" />
-
       <main className="flex-1 p-6 space-y-8">
+        <div className="opacity-0 h-0 overflow-hidden absolute">
+          <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Dashboard</h1>
+          <p className="text-zinc-400 text-sm">Welcome back, TikiMaster_NG 🎬</p>
+        </div>
+
         {/* KPI Cards */}
         <section>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -61,8 +65,8 @@ export default function ClipperDashboard() {
               View all
             </Link>
           </div>
-          <div className="bg-[#0a0a0a] border border-white/6 rounded-2xl overflow-hidden">
-            <table className="w-full text-sm">
+          <div className="bg-[#0a0a0a] border border-white/6 rounded-2xl overflow-hidden overflow-x-auto">
+            <table className="w-full text-sm min-w-[500px]">
               <thead>
                 <tr className="border-b border-white/5">
                   {["Campaign", "Niche", "CPM", "Status"].map((h) => (

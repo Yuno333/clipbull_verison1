@@ -2,6 +2,9 @@ import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { AdminSidebar } from "@/components/dashboard/admin-sidebar";
 import { AdminLoginForm } from "@/components/dashboard/admin-login-form";
+import { SidebarProvider } from "@/lib/sidebar-context";
+import { TitleProvider } from "@/lib/title-context";
+import { Topbar } from "@/components/dashboard/shared/topbar";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies();
@@ -17,14 +20,18 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   }
 
   return (
-    <div className="flex">
-      <AdminSidebar />
-      <div
-        className="flex-1 min-h-screen overflow-y-auto"
-        style={{ marginLeft: "var(--sidebar-width)" }}
-      >
-        {children}
-      </div>
-    </div>
+    <SidebarProvider>
+      <TitleProvider>
+        <div className="flex min-h-screen bg-[#050508]">
+          <AdminSidebar />
+          <main className="flex-1 lg:ml-[260px] min-h-screen flex flex-col">
+            <Topbar />
+            <div className="flex-1 overflow-x-hidden">
+              {children}
+            </div>
+          </main>
+        </div>
+      </TitleProvider>
+    </SidebarProvider>
   );
 }

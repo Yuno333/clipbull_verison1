@@ -3,11 +3,10 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { Topbar } from "@/components/dashboard/shared/topbar";
-import { PageHeader } from "@/components/dashboard/shared/page-header";
 import { Check, ChevronRight, Link2, FileText, Settings2, Receipt, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useTitle } from "@/lib/title-context";
 
 const STEPS = [
   { id: 1, label: "Content Details", icon: Link2 },
@@ -47,6 +46,8 @@ export default function CreateCampaignPage() {
     durationDays: "",
   });
 
+  useTitle("Create Campaign", `Step ${step} of 4: ${STEPS[step - 1].label}`);
+
   const set = (key: keyof FormData, value: string) =>
     setForm((p) => ({ ...p, [key]: value }));
 
@@ -67,17 +68,16 @@ export default function CreateCampaignPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Topbar title="Create Campaign" />
       <main className="flex-1 p-6 max-w-3xl mx-auto w-full">
-        <PageHeader
-          title="Create New Campaign"
-          subtitle="Launch your content distribution campaign in 4 steps"
-        />
+         <div className="opacity-0 h-0 overflow-hidden absolute">
+          <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Create New Campaign</h1>
+          <p className="text-zinc-400 text-sm">Launch your content distribution campaign in 4 steps</p>
+        </div>
 
         {/* Step Indicator */}
-        <div className="flex items-center gap-0 mb-10">
+        <div className="flex items-center gap-0 mb-10 overflow-x-auto pb-4 scrollbar-hide">
           {STEPS.map((s, i) => (
-            <div key={s.id} className="flex items-center flex-1">
+            <div key={s.id} className="flex items-center flex-1 min-w-fit">
               <button
                 onClick={() => step > s.id && setStep(s.id)}
                 className={cn(
@@ -107,14 +107,14 @@ export default function CreateCampaignPage() {
                 </span>
               </button>
               {i < STEPS.length - 1 && (
-                <div className={cn("flex-1 h-px mx-3 transition-colors duration-300", step > s.id ? "bg-emerald-500/40" : "bg-white/8")} />
+                <div className={cn("flex-1 h-px mx-3 min-w-[20px] transition-colors duration-300", step > s.id ? "bg-emerald-500/40" : "bg-white/8")} />
               )}
             </div>
           ))}
         </div>
 
         {/* Step Content */}
-        <div className="bg-[#0a0a0a] border border-white/6 rounded-2xl p-8">
+        <div className="bg-[#0a0a0a] border border-white/6 rounded-2xl p-6 sm:p-8">
           <AnimatePresence mode="wait">
             {step === 1 && (
               <motion.div
@@ -168,7 +168,7 @@ export default function CreateCampaignPage() {
                 <h2 className="text-lg font-semibold text-white mb-6">Campaign Configuration</h2>
                 <div>
                   <label className={labelCls}>Select Niche <span className="text-primary">*</span></label>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {NICHES.map((n) => (
                       <button
                         key={n}
@@ -185,9 +185,9 @@ export default function CreateCampaignPage() {
                     ))}
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className={labelCls}>CPM Rate (₦ per 1,000 impressions) <span className="text-primary">*</span></label>
+                    <label className={labelCls}>CPM Rate (₦ per 1k views) <span className="text-primary">*</span></label>
                     <div className="relative">
                       <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">₦</span>
                       <input
@@ -234,10 +234,10 @@ export default function CreateCampaignPage() {
                 className="space-y-5"
               >
                 <h2 className="text-lg font-semibold text-white mb-2">Campaign Rules</h2>
-                <p className="text-sm text-zinc-500 mb-6">All fields are optional. Leave blank to use platform defaults.</p>
-                <div className="grid grid-cols-2 gap-4">
+                <p className="text-sm text-zinc-500 mb-6">Optional fields.</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className={labelCls}>Max Payout Per Clipper (₦)</label>
+                    <label className={labelCls}>Max Payout/Clipper (₦)</label>
                     <div className="relative">
                       <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">₦</span>
                       <input
@@ -250,7 +250,7 @@ export default function CreateCampaignPage() {
                     </div>
                   </div>
                   <div>
-                    <label className={labelCls}>Max Number of Clippers</label>
+                    <label className={labelCls}>Max Clippers</label>
                     <input
                       className={inputCls}
                       type="number"
@@ -294,7 +294,7 @@ export default function CreateCampaignPage() {
                   ].map((r) => (
                     <div key={r.label} className="flex justify-between text-sm border-b border-white/5 pb-3">
                       <span className="text-zinc-500">{r.label}</span>
-                      <span className="text-white font-medium text-right max-w-xs truncate">{r.value || "—"}</span>
+                      <span className="text-white font-medium text-right max-w-[180px] sm:max-w-xs truncate">{r.value || "—"}</span>
                     </div>
                   ))}
                 </div>

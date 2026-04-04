@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Topbar } from "@/components/dashboard/shared/topbar";
-import { PageHeader } from "@/components/dashboard/shared/page-header";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useTitle } from "@/lib/title-context";
 
 const NICHES = ["Meme", "Politics", "Content Creation", "Crypto", "Finance", "General"];
 
 export default function CreatorSettingsPage() {
+  useTitle("Settings", "Manage your account preferences");
   const [niche, setNiche] = useState("Crypto");
   const [form, setForm] = useState({
     name: "Alex Creator",
@@ -22,17 +22,14 @@ export default function CreatorSettingsPage() {
   });
 
   const set = (key: string, value: string | boolean) =>
-    setForm((p) => ({ ...p, [key]: value }));
+    setForm((p: any) => ({ ...p, [key]: value }));
 
   const inputCls = "w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-primary/50 transition-all";
   const labelCls = "block text-sm font-medium text-zinc-400 mb-1.5";
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Topbar title="Settings" />
       <main className="flex-1 p-6 max-w-2xl mx-auto w-full space-y-8">
-        <PageHeader title="Settings" subtitle="Manage your account preferences" />
-
         {/* Profile Info */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}

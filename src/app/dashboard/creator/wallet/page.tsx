@@ -1,19 +1,10 @@
-"use client";
-
-import { motion } from "framer-motion";
-import { Topbar } from "@/components/dashboard/shared/topbar";
-import { PageHeader } from "@/components/dashboard/shared/page-header";
-import { StatusBadge } from "@/components/dashboard/shared/status-badge";
-import { mockCreatorTransactions, creatorStats } from "@/lib/mock-data";
-import { Wallet, Lock, ArrowDownToLine, RotateCcw } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useTitle } from "@/lib/title-context";
 
 export default function WalletPage() {
+  useTitle("Wallet & Payments", "Manage your balance and campaign funds");
   return (
     <div className="flex flex-col min-h-screen">
-      <Topbar title="Wallet & Payments" />
       <main className="flex-1 p-6 space-y-8">
-        <PageHeader title="Wallet & Payments" subtitle="Manage your balance and campaign funds" />
 
         {/* Balance Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

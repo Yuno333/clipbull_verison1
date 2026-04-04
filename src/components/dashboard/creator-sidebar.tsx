@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
@@ -14,11 +14,14 @@ import {
   Settings,
   LogOut,
   Scissors,
+  Menu,
+  X,
 } from "lucide-react";
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import { useSidebar } from "@/lib/sidebar-context";
 
 const navItems = [
   { label: "Dashboard", href: "/dashboard/creator", icon: LayoutDashboard },
@@ -33,6 +36,7 @@ const navItems = [
 export function CreatorSidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const { isOpen, close } = useSidebar();
   const [userEmail, setUserEmail] = useState<string>("");
   const [userInitials, setUserInitials] = useState<string>("");
   const [userName, setUserName] = useState<string>("");
@@ -66,104 +70,145 @@ export function CreatorSidebar() {
     return () => subscription.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    // Close sidebar on navigation
+    close();
+  }, [pathname, close]);
+
   const handleSignOut = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
     router.push("/auth/login");
   };
 
-  return (
-    <aside
-      className="fixed top-0 left-0 h-screen z-40 flex flex-col"
-      style={{ width: "var(--sidebar-width)" }}
-    >
-      <div className="flex flex-col h-full bg-[#060606] border-r border-white/[0.06]">
-        {/* Logo */}
-        <div className="px-5 py-5 border-b border-white/[0.06]">
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shadow-[0_0_20px_rgba(255,79,0,0.4)]">
-              <Scissors size={16} className="text-white" />
-            </div>
-            <span className="text-base font-bold tracking-tighter text-white">ClipBull</span>
-          </Link>
-        </div>
-
-        {/* Role Label */}
-        <div className="px-5 pt-5 pb-3">
-          <div className="flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-            <span className="text-[11px] font-semibold uppercase tracking-widest text-zinc-500">
-              Creator Dashboard
-            </span>
+  const SidebarContent = () => (
+    <div className="flex flex-col h-full bg-[#060606] border-r border-white/[0.06] w-[260px]">
+      {/* Logo */}
+      <div className="px-5 py-5 border-b border-white/[0.06] flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shadow-[0_0_20px_rgba(124,58,237,0.4)]">
+            <Scissors size={16} className="text-white" />
           </div>
-        </div>
+          <span className="text-base font-bold tracking-tighter text-white">ClipBull</span>
+        </Link>
+        <button 
+          onClick={close}
+          className="lg:hidden p-2 rounded-lg hover:bg-white/5 text-zinc-500 transition-colors"
+        >
+          <X size={18} />
+        </button>
+      </div>
 
-        {/* Nav Items */}
-        <nav className="flex-1 px-3 py-1 space-y-0.5 overflow-y-auto">
-          {navItems.map((item, i) => {
-            const isActive =
-              item.href === "/dashboard/creator"
-                ? pathname === item.href
-                : pathname.startsWith(item.href);
-
-            return (
-              <motion.div
-                key={item.href}
-                initial={{ opacity: 0, x: -12 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.035, duration: 0.2 }}
-              >
-                <Link
-                  href={item.href}
-                  className={cn(
-                    "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group relative cursor-pointer",
-                    isActive
-                      ? "bg-primary/10 text-primary"
-                      : "text-zinc-500 hover:text-zinc-200 hover:bg-white/[0.04]"
-                  )}
-                >
-                  {isActive && (
-                    <motion.div
-                      layoutId="creator-sidebar-active"
-                      className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-4 bg-primary rounded-r-full"
-                      transition={{ type: "spring", bounce: 0.2, duration: 0.4 }}
-                    />
-                  )}
-                  <item.icon
-                    size={16}
-                    className={cn(
-                      "shrink-0 transition-colors",
-                      isActive ? "text-primary" : "text-zinc-600 group-hover:text-zinc-400"
-                    )}
-                  />
-                  {item.label}
-                </Link>
-              </motion.div>
-            );
-          })}
-        </nav>
-
-
-        {/* User */}
-        <div className="px-4 py-4 border-t border-white/[0.06]">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-orange-500 flex items-center justify-center text-xs font-bold text-white shrink-0">
-              {userInitials}
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium text-white truncate">{userName}</div>
-              <div className="text-[11px] text-zinc-600 truncate">{userEmail}</div>
-            </div>
-          </div>
-          <button 
-            onClick={handleSignOut}
-            className="w-full flex items-center gap-2 text-xs text-zinc-600 hover:text-zinc-400 transition-colors px-1 py-1 rounded-md hover:bg-white/[0.04] cursor-pointer"
-          >
-            <LogOut size={13} />
-            Sign out
-          </button>
+      {/* Role Label */}
+      <div className="px-5 pt-5 pb-3">
+        <div className="flex items-center gap-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+          <span className="text-[11px] font-semibold uppercase tracking-widest text-zinc-500">
+            Creator Dashboard
+          </span>
         </div>
       </div>
-    </aside>
+
+      {/* Nav Items */}
+      <nav className="flex-1 px-3 py-1 space-y-0.5 overflow-y-auto">
+        {navItems.map((item, i) => {
+          const isActive =
+            item.href === "/dashboard/creator"
+              ? pathname === item.href
+              : pathname.startsWith(item.href);
+
+          return (
+            <motion.div
+              key={item.href}
+              initial={{ opacity: 0, x: -12 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.035, duration: 0.2 }}
+            >
+              <Link
+                href={item.href}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group relative cursor-pointer",
+                  isActive
+                    ? "bg-primary/10 text-primary"
+                    : "text-zinc-500 hover:text-zinc-200 hover:bg-white/[0.04]"
+                )}
+              >
+                {isActive && (
+                  <motion.div
+                    layoutId="sidebar-active"
+                    className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-4 bg-primary rounded-r-full"
+                    transition={{ type: "spring", bounce: 0.2, duration: 0.4 }}
+                  />
+                )}
+                <item.icon
+                  size={16}
+                  className={cn(
+                    "shrink-0 transition-colors",
+                    isActive ? "text-primary" : "text-zinc-600 group-hover:text-zinc-400"
+                  )}
+                />
+                {item.label}
+              </Link>
+            </motion.div>
+          );
+        })}
+      </nav>
+
+      {/* User */}
+      <div className="px-4 py-4 border-t border-white/[0.06]">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-purple-400 flex items-center justify-center text-xs font-bold text-white shrink-0">
+            {userInitials}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-medium text-white truncate">{userName}</div>
+            <div className="text-[11px] text-zinc-600 truncate">{userEmail}</div>
+          </div>
+        </div>
+        <button 
+          onClick={handleSignOut}
+          className="w-full flex items-center gap-2 text-xs text-zinc-600 hover:text-zinc-400 transition-colors px-1 py-2 rounded-md hover:bg-white/[0.04] cursor-pointer"
+        >
+          <LogOut size={13} />
+          Sign out
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <>
+      {/* Desktop Sidebar */}
+      <aside
+        className="fixed top-0 left-0 h-screen z-40 hidden lg:flex flex-col"
+        style={{ width: "var(--sidebar-width)" }}
+      >
+        <SidebarContent />
+      </aside>
+
+      {/* Mobile Sidebar */}
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={close}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] lg:hidden"
+            />
+            <motion.aside
+              initial={{ x: "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="fixed top-0 left-0 h-screen z-[101] flex flex-col lg:hidden"
+            >
+              <SidebarContent />
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

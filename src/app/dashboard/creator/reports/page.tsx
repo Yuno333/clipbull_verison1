@@ -2,36 +2,34 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Topbar } from "@/components/dashboard/shared/topbar";
-import { PageHeader } from "@/components/dashboard/shared/page-header";
 import { mockCampaigns } from "@/lib/mock-data";
 import { BarChart3, TrendingUp, Eye, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTitle } from "@/lib/title-context";
 
 export default function ReportsPage() {
+  useTitle("Performance Reports", "Analyse your distribution campaign metrics");
   const [selectedCampaign, setSelectedCampaign] = useState("all");
 
-  const totalImpressions = mockCampaigns.reduce((a, c) => a + c.impressions, 0);
-  const totalSpend = mockCampaigns.reduce((a, c) => a + c.spent, 0);
+  const totalImpressions = mockCampaigns.reduce((a: any, c: any) => a + c.impressions, 0);
+  const totalSpend = mockCampaigns.reduce((a: any, c: any) => a + c.spent, 0);
   const avgCpm = totalImpressions > 0 ? (totalSpend / totalImpressions) * 1000 : 0;
 
   const filtered =
     selectedCampaign === "all"
       ? mockCampaigns
-      : mockCampaigns.filter((c) => c.id === selectedCampaign);
+      : mockCampaigns.filter((c: any) => c.id === selectedCampaign);
 
   const topClip = { platform: "TikTok", impressions: 48200, campaign: "CryptoX Awareness Push" };
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Topbar title="Performance Reports" />
       <main className="flex-1 p-6 space-y-8">
         <div className="flex items-start justify-between flex-wrap gap-4">
-          <PageHeader
-            title="Performance Reports"
-            subtitle="Analyse your distribution campaign metrics"
-            className="mb-0"
-          />
+          <div className="opacity-0 h-0 overflow-hidden absolute">
+            <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Performance Reports</h1>
+            <p className="text-zinc-400 text-sm">Analyse your distribution campaign metrics</p>
+          </div>
           <Button
             size="sm"
             variant="outline"
@@ -54,7 +52,7 @@ export default function ReportsPage() {
             onChange={(e) => setSelectedCampaign(e.target.value)}
           >
             <option value="all">All Campaigns</option>
-            {mockCampaigns.map((c) => (
+            {mockCampaigns.map((c: any) => (
               <option key={c.id} value={c.id}>
                 {c.title}
               </option>
@@ -73,7 +71,7 @@ export default function ReportsPage() {
             { label: "Total Impressions", value: totalImpressions.toLocaleString(), icon: Eye, color: "text-blue-400", bg: "bg-blue-500/10", border: "border-blue-500/20" },
             { label: "Total Spend", value: `₦${totalSpend.toLocaleString()}`, icon: TrendingUp, color: "text-primary", bg: "bg-primary/10", border: "border-primary/20" },
             { label: "Average CPM", value: `₦${avgCpm.toFixed(0)}`, icon: BarChart3, color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20" },
-          ].map((m, i) => (
+          ].map((m: any, i: any) => (
             <motion.div
               key={m.label}
               initial={{ opacity: 0, y: 16 }}
@@ -111,7 +109,7 @@ export default function ReportsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/4">
-                {filtered.map((c, i) => (
+                {filtered.map((c: any, i: any) => (
                   <motion.tr
                     key={c.id}
                     initial={{ opacity: 0, x: -12 }}

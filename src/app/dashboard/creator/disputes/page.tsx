@@ -1,19 +1,22 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Topbar } from "@/components/dashboard/shared/topbar";
-import { PageHeader } from "@/components/dashboard/shared/page-header";
 import { StatusBadge } from "@/components/dashboard/shared/status-badge";
 import { mockCreatorDisputes } from "@/lib/mock-data";
 import { AlertTriangle, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTitle } from "@/lib/title-context";
 
 export default function CreatorDisputesPage() {
+  useTitle("Disputes", "Report and track disputes with clippers");
+
   return (
     <div className="flex flex-col min-h-screen">
-      <Topbar title="Disputes" />
       <main className="flex-1 p-6 space-y-8">
-        <PageHeader title="Disputes" subtitle="Report and track disputes with clippers" />
+        <div className="opacity-0 h-0 overflow-hidden absolute">
+          <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Disputes</h1>
+          <p className="text-zinc-400 text-sm">Report and track disputes with clippers</p>
+        </div>
 
         {/* Disputes Table */}
         <motion.div

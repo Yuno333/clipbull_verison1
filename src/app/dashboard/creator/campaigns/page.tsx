@@ -3,28 +3,32 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Topbar } from "@/components/dashboard/shared/topbar";
-import { PageHeader } from "@/components/dashboard/shared/page-header";
 import { StatusBadge } from "@/components/dashboard/shared/status-badge";
 import { mockCampaigns } from "@/lib/mock-data";
 import { PlusCircle, Eye, PauseCircle, PlusSquare } from "lucide-react";
+import { useTitle } from "@/lib/title-context";
 
 export default function MyCampaignsPage() {
   const router = useRouter();
+  useTitle("My Campaigns", "Manage and monitor all your distribution campaigns");
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Topbar title="My Campaigns" />
       <main className="flex-1 p-6">
-        <PageHeader
-          title="My Campaigns"
-          subtitle="Manage and monitor all your distribution campaigns"
-          cta={{
-            label: "Create Campaign",
-            icon: PlusCircle,
-            onClick: () => router.push("/dashboard/creator/campaigns/create"),
-          }}
-        />
+        <div className="opacity-0 h-0 overflow-hidden absolute">
+          <h1 className="text-3xl font-bold text-white tracking-tight mb-2">My Campaigns</h1>
+          <p className="text-zinc-400 text-sm">Manage and monitor all your distribution campaigns</p>
+        </div>
+
+        <div className="flex justify-end mb-6">
+          <button 
+            onClick={() => router.push("/dashboard/creator/campaigns/create")}
+            className="bg-primary hover:bg-primary/90 text-white rounded-xl h-11 px-6 font-semibold flex items-center gap-2 shadow-[0_0_20px_rgba(255,79,0,0.3)] transition-all"
+          >
+            <PlusCircle size={18} />
+            Create Campaign
+          </button>
+        </div>
 
         <motion.div
           initial={{ opacity: 0, y: 16 }}

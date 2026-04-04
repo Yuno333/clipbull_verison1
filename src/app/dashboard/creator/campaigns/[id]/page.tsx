@@ -4,16 +4,18 @@ import { use } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Topbar } from "@/components/dashboard/shared/topbar";
 import { StatusBadge } from "@/components/dashboard/shared/status-badge";
 import { mockCampaigns, mockClipSubmissions } from "@/lib/mock-data";
 import { ArrowLeft, ExternalLink, PauseCircle, Flag } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTitle } from "@/lib/title-context";
 
 export default function CampaignDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const campaign = mockCampaigns.find((c) => c.id === id);
   if (!campaign) notFound();
+
+  useTitle(campaign.title, "Campaign Details & Stats");
 
   const clips = mockClipSubmissions.filter((s) => s.campaignId === campaign.id);
   const remaining = campaign.budget - campaign.spent;
@@ -21,8 +23,12 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Topbar title={campaign.title} />
       <main className="flex-1 p-6 max-w-5xl mx-auto w-full space-y-8">
+        <div className="opacity-0 h-0 overflow-hidden absolute">
+          <h1 className="text-3xl font-bold text-white tracking-tight mb-2">{campaign.title}</h1>
+          <p className="text-zinc-400 text-sm">Campaign Details & Stats</p>
+        </div>
+
         {/* Back */}
         <Link
           href="/dashboard/creator/campaigns"
@@ -41,7 +47,7 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-xl font-bold text-white">{campaign.title}</h1>
+                <h1 className="text-xl font-bold text-white lg:hidden">{campaign.title}</h1>
                 <StatusBadge status={campaign.status} />
               </div>
               <p className="text-sm text-zinc-400 leading-relaxed max-w-2xl">{campaign.description}</p>
@@ -111,8 +117,8 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
           transition={{ delay: 0.15 }}
         >
           <h2 className="text-sm font-semibold text-white mb-4">Clipper Activity</h2>
-          <div className="bg-[#0a0a0a] border border-white/6 rounded-2xl overflow-hidden">
-            <table className="w-full text-sm">
+          <div className="bg-[#0a0a0a] border border-white/6 rounded-2xl overflow-hidden overflow-x-auto">
+            <table className="w-full text-sm min-w-[700px]">
               <thead>
                 <tr className="border-b border-white/5">
                   {["Clipper", "Post Link", "Platform", "Impressions", "Earnings", "Status", "Action"].map((h) => (

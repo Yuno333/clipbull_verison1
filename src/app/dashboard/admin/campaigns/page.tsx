@@ -13,7 +13,10 @@ const mockCampaigns = [
   { id: "4", name: "Brand Awareness HQ", creator: "Nike Official", budget: "₦1,000,000", spent: "₦450,000", clips: 89, impressions: "5.4M", status: "paused", type: "CPA" },
 ];
 
+import { useTitle } from "@/lib/title-context";
+
 export default function CampaignsPage() {
+  useTitle("Global Campaigns", "Monitor all active and historical campaigns across the platform.");
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState<"all" | "active" | "paused" | "completed">("all");
 
@@ -32,7 +35,7 @@ export default function CampaignsPage() {
         transition={{ duration: 0.5 }}
       >
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-          <div>
+          <div className="opacity-0 h-0 overflow-hidden absolute">
             <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Global Campaigns</h1>
             <p className="text-zinc-400 text-sm">Monitor all active and historical campaigns across the platform.</p>
           </div>

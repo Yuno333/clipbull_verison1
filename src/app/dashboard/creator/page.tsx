@@ -4,17 +4,16 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { KpiCard } from "@/components/dashboard/shared/kpi-card";
 import { StatusBadge } from "@/components/dashboard/shared/status-badge";
-import { Topbar } from "@/components/dashboard/shared/topbar";
 import { mockCampaigns, creatorStats } from "@/lib/mock-data";
 import { Megaphone, DollarSign, TrendingUp, BarChart3, PlusCircle, ExternalLink } from "lucide-react";
+import { useTitle } from "@/lib/title-context";
 
 export default function CreatorDashboard() {
+  useTitle("Dashboard", "Welcome back, Alex 👋");
   const activeCampaigns = mockCampaigns.filter((c) => c.status === "Active");
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Topbar title="Dashboard" subtitle="Welcome back, Alex 👋" />
-
       <main className="flex-1 p-6 space-y-8">
         {/* KPI Cards */}
         <section>

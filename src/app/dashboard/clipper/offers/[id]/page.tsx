@@ -5,10 +5,10 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { Topbar } from "@/components/dashboard/shared/topbar";
 import { mockOffers } from "@/lib/mock-data";
 import { ArrowLeft, ExternalLink, Users, DollarSign, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTitle } from "@/lib/title-context";
 
 export default function OfferDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -18,10 +18,16 @@ export default function OfferDetailPage({ params }: { params: Promise<{ id: stri
   const router = useRouter();
   const pctRemaining = (offer.budgetRemaining / offer.totalBudget) * 100;
 
+  useTitle(offer.title, "Offer Details & Join Campaign");
+
   return (
     <div className="flex flex-col min-h-screen">
-      <Topbar title={offer.title} />
       <main className="flex-1 p-6 max-w-3xl mx-auto w-full space-y-8">
+        <div className="opacity-0 h-0 overflow-hidden absolute">
+          <h1 className="text-3xl font-bold text-white tracking-tight mb-2">{offer.title}</h1>
+          <p className="text-zinc-400 text-sm">Offer Details & Join Campaign</p>
+        </div>
+
         <Link
           href="/dashboard/clipper/offers"
           className="inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-white transition-colors"
@@ -38,7 +44,7 @@ export default function OfferDetailPage({ params }: { params: Promise<{ id: stri
           {/* Header */}
           <div>
             <div className="flex items-start justify-between gap-4 mb-2">
-              <h1 className="text-xl font-bold text-white">{offer.title}</h1>
+              <h1 className="text-xl font-bold text-white lg:hidden">{offer.title}</h1>
               <span className="text-xs font-medium text-zinc-300 bg-white/5 border border-white/8 px-2.5 py-1.5 rounded-lg shrink-0">
                 {offer.niche}
               </span>
@@ -47,7 +53,7 @@ export default function OfferDetailPage({ params }: { params: Promise<{ id: stri
           </div>
 
           {/* Info Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
             {[
               { icon: DollarSign, label: "CPM Rate", value: `₦${offer.cpm.toLocaleString()}`, color: "text-emerald-400" },
               { icon: Users, label: "Clippers Joined", value: `${offer.clippersJoined}${offer.maxClippers ? `/${offer.maxClippers}` : ""}`, color: "text-blue-400" },
@@ -67,7 +73,7 @@ export default function OfferDetailPage({ params }: { params: Promise<{ id: stri
           <div>
             <div className="flex justify-between text-sm mb-2">
               <span className="text-zinc-500">Budget Remaining</span>
-              <span className="font-mono text-white">₦{offer.budgetRemaining.toLocaleString()} / ₦{offer.totalBudget.toLocaleString()}</span>
+              <span className="font-mono text-white text-xs sm:text-sm">₦{offer.budgetRemaining.toLocaleString()} / ₦{offer.totalBudget.toLocaleString()}</span>
             </div>
             <div className="h-2 bg-white/6 rounded-full overflow-hidden">
               <motion.div
@@ -86,7 +92,7 @@ export default function OfferDetailPage({ params }: { params: Promise<{ id: stri
               href={offer.contentLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm text-primary hover:underline bg-primary/8 border border-primary/20 px-3 py-2 rounded-lg transition-colors"
+              className="inline-flex items-center gap-2 text-sm text-primary hover:underline bg-primary/8 border border-primary/20 px-3 py-2 rounded-lg transition-colors w-full sm:w-auto justify-center sm:justify-start"
             >
               <ExternalLink size={14} />
               View Original Content

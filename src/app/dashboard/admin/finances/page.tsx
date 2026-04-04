@@ -12,7 +12,11 @@ const mockTransactions = [
   { id: "TX-898", type: "withdrawal", user: "Emma Thompson", amount: "₦45,000", status: "completed", date: "昨天" },
 ];
 
+import { useTitle } from "@/lib/title-context";
+
 export default function FinancesPage() {
+  useTitle("Platform Finances", "Monitor platform revenue, escrow reserves, and withdrawal requests.");
+
   return (
     <div className="p-8 pb-20">
       <motion.div
@@ -20,7 +24,7 @@ export default function FinancesPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="mb-10">
+        <div className="opacity-0 h-0 overflow-hidden absolute">
           <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Platform Finances</h1>
           <p className="text-zinc-400 text-sm">Monitor platform revenue, escrow reserves, and withdrawal requests.</p>
         </div>

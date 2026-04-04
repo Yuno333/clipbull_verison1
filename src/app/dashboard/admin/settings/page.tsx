@@ -5,7 +5,10 @@ import { Settings, Shield, Bell, Zap, Save, AlertCircle, Lock, Monitor, Database
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
+import { useTitle } from "@/lib/title-context";
+
 export default function AdminSettingsPage() {
+  useTitle("Global Settings", "Configure platform-wide parameters and security protocols.");
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = () => {
@@ -20,7 +23,7 @@ export default function AdminSettingsPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="mb-10">
+        <div className="opacity-0 h-0 overflow-hidden absolute">
           <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Global Settings</h1>
           <p className="text-zinc-400 text-sm">Configure platform-wide parameters and security protocols.</p>
         </div>

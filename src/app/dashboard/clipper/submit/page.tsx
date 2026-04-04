@@ -2,13 +2,12 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Topbar } from "@/components/dashboard/shared/topbar";
-import { PageHeader } from "@/components/dashboard/shared/page-header";
 import { StatusBadge } from "@/components/dashboard/shared/status-badge";
 import { mockClipperCampaigns, mockClipSubmissions } from "@/lib/mock-data";
 import { Button } from "@/components/ui/button";
 import { Send, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTitle } from "@/lib/title-context";
 
 const PLATFORMS = ["TikTok", "Instagram", "YouTube Shorts", "Twitter/X"];
 
@@ -21,6 +20,8 @@ export default function SubmitClipsPage() {
     notes: "",
   });
 
+  useTitle("Submit Clips", "Add your repost link for impressions verification");
+
   const set = (key: string, value: string) =>
     setForm((p) => ({ ...p, [key]: value }));
 
@@ -32,7 +33,6 @@ export default function SubmitClipsPage() {
   if (submitted) {
     return (
       <div className="flex flex-col min-h-screen">
-        <Topbar title="Submit Clips" />
         <main className="flex-1 p-6 flex items-center justify-center">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -58,9 +58,11 @@ export default function SubmitClipsPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Topbar title="Submit Clips" />
       <main className="flex-1 p-6 max-w-2xl mx-auto w-full space-y-8">
-        <PageHeader title="Submit a Clip" subtitle="Add your repost link for impressions verification" />
+        <div className="opacity-0 h-0 overflow-hidden absolute">
+          <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Submit a Clip</h1>
+          <p className="text-zinc-400 text-sm">Add your repost link for impressions verification</p>
+        </div>
 
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -78,7 +80,7 @@ export default function SubmitClipsPage() {
               <option value="">Choose a campaign...</option>
               {mockClipperCampaigns.map((c) => (
                 <option key={c.campaignId} value={c.campaignId}>
-                  {c.title} — ₦{c.cpm}/1k impressions
+                  {c.title} — ₦{c.cpm}/1k
                 </option>
               ))}
             </select>
@@ -104,7 +106,7 @@ export default function SubmitClipsPage() {
                   key={p}
                   onClick={() => set("platform", p)}
                   className={cn(
-                    "py-2.5 px-3 rounded-lg text-sm font-medium border transition-all duration-200",
+                    "py-2.5 px-3 rounded-lg text-xs sm:text-sm font-medium border transition-all duration-200",
                     form.platform === p
                       ? "bg-primary/15 border-primary/40 text-primary"
                       : "bg-white/4 border-white/8 text-zinc-400 hover:bg-white/8 hover:text-white"
@@ -144,8 +146,8 @@ export default function SubmitClipsPage() {
           transition={{ delay: 0.15 }}
         >
           <h2 className="text-sm font-semibold text-white mb-4">Recent Submissions</h2>
-          <div className="bg-[#0a0a0a] border border-white/6 rounded-2xl overflow-hidden">
-            <table className="w-full text-sm">
+          <div className="bg-[#0a0a0a] border border-white/6 rounded-2xl overflow-hidden overflow-x-auto">
+            <table className="w-full text-sm min-w-[500px]">
               <thead>
                 <tr className="border-b border-white/5">
                   {["Platform", "Post", "Impressions", "Earnings", "Status"].map((h) => (

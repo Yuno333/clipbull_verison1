@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Topbar } from "@/components/dashboard/shared/topbar";
-import { PageHeader } from "@/components/dashboard/shared/page-header";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useTitle } from "@/lib/title-context";
 
 const NICHES = ["Meme", "Politics", "Content Creation", "Crypto", "Finance", "General"];
 
@@ -17,12 +16,14 @@ export default function ClipperSettingsPage() {
     tiktok: "@TikiMaster_NG",
     instagram: "@tikimaster",
     youtube: "TikiMasterNG",
-    bank: "Zenith Bank",
+    bank: "Zen Zenith Bank",
     accountNumber: "****4821",
     notify_offers: true,
     notify_approvals: true,
     notify_payouts: false,
   });
+
+  useTitle("Settings", "Manage your clipper profile and preferences");
 
   const set = (key: string, value: string | boolean) =>
     setForm((p) => ({ ...p, [key]: value }));
@@ -32,9 +33,11 @@ export default function ClipperSettingsPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Topbar title="Settings" />
       <main className="flex-1 p-6 max-w-2xl mx-auto w-full space-y-8">
-        <PageHeader title="Settings" subtitle="Manage your clipper profile and preferences" />
+        <div className="opacity-0 h-0 overflow-hidden absolute">
+          <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Settings</h1>
+          <p className="text-zinc-400 text-sm">Manage your clipper profile and preferences</p>
+        </div>
 
         {/* Profile */}
         <motion.div
@@ -43,7 +46,7 @@ export default function ClipperSettingsPage() {
           className="bg-[#0a0a0a] border border-white/6 rounded-2xl p-6 space-y-5"
         >
           <h2 className="text-sm font-semibold text-white">Profile Info</h2>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className={labelCls}>Display Name</label>
               <input className={inputCls} value={form.name} onChange={(e) => set("name", e.target.value)} />
@@ -66,13 +69,13 @@ export default function ClipperSettingsPage() {
             <h2 className="text-sm font-semibold text-white">Primary Niche</h2>
             <p className="text-xs text-zinc-500 mt-1">Offers matching your primary niche will be highlighted first.</p>
           </div>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {NICHES.map((n) => (
               <button
                 key={n}
                 onClick={() => setPrimaryNiche(n)}
                 className={cn(
-                  "py-2.5 px-3 rounded-lg text-sm font-medium border transition-all duration-200",
+                  "py-2.5 px-3 rounded-lg text-xs sm:text-sm font-medium border transition-all duration-200",
                   primaryNiche === n
                     ? "bg-primary/15 border-primary/40 text-primary"
                     : "bg-white/4 border-white/8 text-zinc-400 hover:bg-white/8 hover:text-white"
@@ -118,7 +121,7 @@ export default function ClipperSettingsPage() {
           className="bg-[#0a0a0a] border border-white/6 rounded-2xl p-6 space-y-4"
         >
           <h2 className="text-sm font-semibold text-white">Payment Method</h2>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className={labelCls}>Bank Name</label>
               <input className={inputCls} value={form.bank} onChange={(e) => set("bank", e.target.value)} />
@@ -170,7 +173,7 @@ export default function ClipperSettingsPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <Button className="bg-primary hover:bg-primary/90 text-white rounded-xl px-8 shadow-[0_0_20px_rgba(255,79,0,0.3)]">
+          <Button className="bg-primary hover:bg-primary/90 text-white rounded-xl px-8 shadow-[0_0_20px_rgba(255,79,0,0.3)] w-full sm:w-auto">
             Save Changes
           </Button>
         </motion.div>

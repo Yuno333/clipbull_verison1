@@ -2,32 +2,34 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Topbar } from "@/components/dashboard/shared/topbar";
-import { PageHeader } from "@/components/dashboard/shared/page-header";
 import { StatusBadge } from "@/components/dashboard/shared/status-badge";
 import { mockClipperDisputes } from "@/lib/mock-data";
 import { AlertTriangle, Paperclip, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useTitle } from "@/lib/title-context";
 
 export default function ClipperDisputesPage() {
   const [appealText, setAppealText] = useState("");
+  useTitle("Disputes", "Raise and track issues with campaigns");
 
   const inputCls = "w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-primary/50 transition-all";
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Topbar title="Disputes" />
       <main className="flex-1 p-6 space-y-8">
-        <PageHeader title="Disputes" subtitle="Raise and track issues with campaigns" />
+        <div className="opacity-0 h-0 overflow-hidden absolute">
+          <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Disputes</h1>
+          <p className="text-zinc-400 text-sm">Raise and track issues with campaigns</p>
+        </div>
 
         {/* Disputes Table */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-[#0a0a0a] border border-white/6 rounded-2xl overflow-hidden"
+          className="bg-[#0a0a0a] border border-white/6 rounded-2xl overflow-hidden overflow-x-auto"
         >
-          <table className="w-full text-sm">
+          <table className="w-full text-sm min-w-[500px]">
             <thead>
               <tr className="border-b border-white/5">
                 {["Campaign", "Issue", "Status", "Date"].map((h) => (
@@ -114,7 +116,7 @@ export default function ClipperDisputesPage() {
               <Button
                 size="sm"
                 disabled={!appealText}
-                className="bg-primary hover:bg-primary/90 text-white rounded-lg gap-1.5 disabled:opacity-40"
+                className="bg-primary hover:bg-primary/90 text-white rounded-lg gap-1.5 disabled:opacity-40 w-full sm:w-auto"
               >
                 <Send size={13} />
                 Submit Appeal

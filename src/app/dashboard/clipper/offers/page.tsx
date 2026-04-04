@@ -3,11 +3,10 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Topbar } from "@/components/dashboard/shared/topbar";
-import { PageHeader } from "@/components/dashboard/shared/page-header";
 import { mockOffers } from "@/lib/mock-data";
 import { ArrowRight, Filter } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTitle } from "@/lib/title-context";
 
 const ALL_NICHES = ["All", "Meme", "Politics", "Content Creation", "Crypto", "Finance", "General"];
 
@@ -15,6 +14,8 @@ export default function AvailableOffersPage() {
   const [niche, setNiche] = useState("All");
   const [minCpm, setMinCpm] = useState("");
   const [maxCpm, setMaxCpm] = useState("");
+
+  useTitle("Available Offers", "Browse campaigns matching your niche profile");
 
   const filtered = mockOffers.filter((o) => {
     if (niche !== "All" && o.niche !== niche) return false;
@@ -25,9 +26,11 @@ export default function AvailableOffersPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Topbar title="Available Offers" />
       <main className="flex-1 p-6 space-y-6">
-        <PageHeader title="Available Offers" subtitle="Browse campaigns matching your niche profile" />
+        <div className="opacity-0 h-0 overflow-hidden absolute">
+          <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Available Offers</h1>
+          <p className="text-zinc-400 text-sm">Browse campaigns matching your niche profile</p>
+        </div>
 
         {/* Filters */}
         <motion.div
@@ -39,20 +42,22 @@ export default function AvailableOffersPage() {
             <Filter size={13} />
             Filter:
           </div>
-          {ALL_NICHES.map((n) => (
-            <button
-              key={n}
-              onClick={() => setNiche(n)}
-              className={cn(
-                "px-3 py-1.5 rounded-lg text-xs font-medium border transition-all duration-200",
-                niche === n
-                  ? "bg-primary/15 border-primary/40 text-primary"
-                  : "bg-white/5 border-white/8 text-zinc-400 hover:text-white hover:bg-white/8"
-              )}
-            >
-              {n}
-            </button>
-          ))}
+          <div className="flex flex-wrap gap-2">
+            {ALL_NICHES.map((n) => (
+              <button
+                key={n}
+                onClick={() => setNiche(n)}
+                className={cn(
+                  "px-3 py-1.5 rounded-lg text-xs font-medium border transition-all duration-200",
+                  niche === n
+                    ? "bg-primary/15 border-primary/40 text-primary"
+                    : "bg-white/5 border-white/8 text-zinc-400 hover:text-white hover:bg-white/8"
+                )}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
           <div className="flex items-center gap-2 ml-1">
             <input
               className="w-20 bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white placeholder:text-zinc-600 focus:outline-none focus:border-primary/40"
@@ -80,7 +85,7 @@ export default function AvailableOffersPage() {
           className="bg-[#0a0a0a] border border-white/6 rounded-2xl overflow-hidden"
         >
           <div className="overflow-x-auto">
-            <table className="w-full text-sm min-w-[600px]">
+            <table className="w-full text-sm min-w-[700px]">
               <thead>
                 <tr className="border-b border-white/5">
                   {["Campaign", "Niche", "CPM", "Budget Left", "Clippers", "Action"].map((h) => (
@@ -110,21 +115,21 @@ export default function AvailableOffersPage() {
                     </td>
                     <td className="px-5 py-4 font-mono text-white font-semibold">₦{o.cpm.toLocaleString()}</td>
                     <td className="px-5 py-4">
-                      <div className="font-mono text-white">₦{o.budgetRemaining.toLocaleString()}</div>
-                      <div className="h-1 w-24 bg-white/8 rounded-full mt-1.5 overflow-hidden">
+                      <div className="font-mono text-white text-xs">₦{o.budgetRemaining.toLocaleString()}</div>
+                      <div className="h-1 w-20 bg-white/8 rounded-full mt-1.5 overflow-hidden">
                         <div
                           className="h-full bg-emerald-500 rounded-full"
                           style={{ width: `${(o.budgetRemaining / o.totalBudget) * 100}%` }}
                         />
                       </div>
                     </td>
-                    <td className="px-5 py-4 text-zinc-400 text-sm">
+                    <td className="px-5 py-4 text-zinc-400 text-xs">
                       {o.clippersJoined}{o.maxClippers ? `/${o.maxClippers}` : ""}
                     </td>
                     <td className="px-5 py-4 text-center">
                       <Link
                         href={`/dashboard/clipper/offers/${o.id}`}
-                        className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:text-orange-300 bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/40 px-3 py-1.5 rounded-lg transition-all"
+                        className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-primary hover:text-orange-300 bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/40 px-3 py-1.5 rounded-lg transition-all"
                       >
                         View / Join
                         <ArrowRight size={12} />

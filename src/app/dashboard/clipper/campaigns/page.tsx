@@ -2,29 +2,29 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Topbar } from "@/components/dashboard/shared/topbar";
-import { PageHeader } from "@/components/dashboard/shared/page-header";
 import { StatusBadge } from "@/components/dashboard/shared/status-badge";
 import { mockClipperCampaigns } from "@/lib/mock-data";
 import { Eye, Send } from "lucide-react";
+import { useTitle } from "@/lib/title-context";
 
 export default function ClipperCampaignsPage() {
+  useTitle("My Campaigns", "Campaigns you've joined and are actively clipping");
+
   return (
     <div className="flex flex-col min-h-screen">
-      <Topbar title="My Campaigns" />
       <main className="flex-1 p-6">
-        <PageHeader
-          title="My Campaigns"
-          subtitle="Campaigns you've joined and are actively clipping"
-        />
+        <div className="opacity-0 h-0 overflow-hidden absolute">
+          <h1 className="text-3xl font-bold text-white tracking-tight mb-2">My Campaigns</h1>
+          <p className="text-zinc-400 text-sm">Campaigns you've joined and are actively clipping</p>
+        </div>
 
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-[#0a0a0a] border border-white/6 rounded-2xl overflow-hidden"
+          className="bg-[#0a0a0a] border border-white/6 rounded-2xl overflow-hidden overflow-x-auto"
         >
-          <table className="w-full text-sm">
+          <table className="w-full text-sm min-w-[700px]">
             <thead>
               <tr className="border-b border-white/5">
                 {["Campaign", "Niche", "CPM", "Clips", "Earned", "Status", "Actions"].map((h) => (
