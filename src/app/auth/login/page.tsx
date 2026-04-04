@@ -53,7 +53,8 @@ export default function LoginPage() {
       }
 
       if (data.user) {
-        const role = data.user.user_metadata?.role || "creator";
+        // Check for admin role in metadata (app_metadata preferred, user_metadata as fallback)
+        const role = data.user.app_metadata?.role || data.user.user_metadata?.role || "creator";
         router.push(`/dashboard/${role}`);
       }
     } catch {

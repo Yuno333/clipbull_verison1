@@ -17,6 +17,8 @@ import {
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { logoutAdmin } from "@/lib/admin-actions";
+import { useRouter } from "next/navigation";
 
 const navItems = [
   { label: "Overview", href: "/dashboard/admin", icon: LayoutDashboard },
@@ -31,21 +33,39 @@ export function AdminSidebar() {
   const pathname = usePathname();
   const [userEmail, setUserEmail] = useState<string>("Loading...");
   const [userInitials, setUserInitials] = useState<string>("..");
-  const [userName, setUserName] = useState<string>("Loading...");
+  const [userName, setUserName] = useState<string>("System Admin");
+  const router = useRouter();
 
   useEffect(() => {
     const fetchUser = async () => {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        setUserEmail(user.email || "Unknown");
+        setUserEmail(user.email || "admin@clipbull.com");
         const name = user.user_metadata?.username || user.user_metadata?.full_name || user.email?.split("@")[0] || "Admin";
         setUserName(name);
         setUserInitials(name.substring(0, 2).toUpperCase());
+      } else {
+        // Fallback for Secret Admin login
+        setUserEmail("platform.admin@clipbull.com");
+        setUserInitials("SA");
+        setUserName("System Admin");
       }
     };
     fetchUser();
   }, []);
+
+  const handleSignOut = async () => {
+    // 1. Try Supabase sign out
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    
+    // 2. Clear Admin cookie
+    await logoutAdmin();
+    
+    // 3. Redirect
+    router.push("/auth/login");
+  };
 
   return (
     <aside
@@ -129,7 +149,10 @@ export function AdminSidebar() {
               <div className="text-[11px] text-zinc-600 truncate">{userEmail}</div>
             </div>
           </div>
-          <button className="w-full flex items-center gap-2 text-xs text-zinc-600 hover:text-zinc-400 transition-colors px-1 py-1 rounded-md hover:bg-white/[0.04] cursor-pointer">
+          <button 
+            onClick={handleSignOut}
+            className="w-full flex items-center gap-2 text-xs text-zinc-600 hover:text-zinc-400 transition-colors px-1 py-1 rounded-md hover:bg-white/[0.04] cursor-pointer"
+          >
             <LogOut size={13} />
             Sign out
           </button>

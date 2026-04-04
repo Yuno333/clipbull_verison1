@@ -12,6 +12,7 @@ export async function authenticateAdmin(email: string, password: string) {
       path: "/",
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
       maxAge: 60 * 60 * 24 * 7, // 1 week
     });
     return { success: true };
