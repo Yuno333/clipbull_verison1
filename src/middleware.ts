@@ -25,9 +25,16 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // Helper for safe user retrieval
+  let user = null;
+  try {
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      const { data: { user: supabaseUser } } = await supabase.auth.getUser();
+      user = supabaseUser;
+    }
+  } catch (error) {
+    console.error("Middleware Supabase Error:", error);
+  }
 
   const adminSession = request.cookies.get("clipbull_admin_session");
 
@@ -38,7 +45,7 @@ export async function middleware(request: NextRequest) {
       if (adminSession?.value === "verified") {
         return supabaseResponse;
       }
-      if (user && user.user_metadata?.role === "admin") {
+      if (user && (user.app_metadata?.role === "admin" || user.user_metadata?.role === "admin")) {
         return supabaseResponse;
       }
       // If neither admin cookie nor supabase admin user, redirect to login
