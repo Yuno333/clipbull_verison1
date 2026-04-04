@@ -40,18 +40,9 @@ export async function middleware(request: NextRequest) {
 
   // Protect dashboard routes
   if (request.nextUrl.pathname.startsWith("/dashboard")) {
-    // Special case for admin dashboard
+    // Special case for admin dashboard - Let it pass to handle login via layout
     if (request.nextUrl.pathname.startsWith("/dashboard/admin")) {
-      if (adminSession?.value === "verified") {
-        return supabaseResponse;
-      }
-      if (user && (user.app_metadata?.role === "admin" || user.user_metadata?.role === "admin")) {
-        return supabaseResponse;
-      }
-      // If neither admin cookie nor supabase admin user, redirect to login
-      const url = request.nextUrl.clone();
-      url.pathname = "/auth/login";
-      return NextResponse.redirect(url);
+      return supabaseResponse;
     }
 
     // General user protection
