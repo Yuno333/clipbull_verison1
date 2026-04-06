@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { Check, ChevronRight, Link2, FileText, Settings2, Receipt, ArrowLeft } from "lucide-react";
+import { Check, ChevronRight, Link2, FileText, Settings2, Receipt, ArrowLeft, UploadCloud, Video, Loader2, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useTitle } from "@/lib/title-context";
+import { createClient } from "@/lib/supabase/client";
 
 const STEPS = [
   { id: 1, label: "Content Details", icon: Link2 },
@@ -18,6 +19,8 @@ const STEPS = [
 const NICHES = ["Meme", "Politics", "Content Creation", "Crypto", "Finance", "General"];
 
 interface FormData {
+  uploadType: "link" | "file";
+  contentFileName: string;
   contentLink: string;
   title: string;
   description: string;
@@ -35,6 +38,8 @@ export default function CreateCampaignPage() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<FormData>({
+    uploadType: "link",
+    contentFileName: "",
     contentLink: "",
     title: "",
     description: "",
@@ -48,6 +53,10 @@ export default function CreateCampaignPage() {
 
   useTitle("Create Campaign", `Step ${step} of 4: ${STEPS[step - 1].label}`);
 
+  const [mediaFile, setMediaFile] = useState<File | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
   const set = (key: keyof FormData, value: string) =>
     setForm((p) => ({ ...p, [key]: value }));
 
@@ -56,7 +65,10 @@ export default function CreateCampaignPage() {
   const totalPayable = budget + platformFee;
 
   const canNext = () => {
-    if (step === 1) return form.contentLink && form.title && form.description;
+    if (step === 1) {
+      const hasContent = form.uploadType === "file" ? !!form.contentFileName : !!form.contentLink;
+      return hasContent && form.title && form.description;
+    }
     if (step === 2) return form.niche && form.cpm && form.budget;
     return true;
   };
@@ -66,10 +78,44 @@ export default function CreateCampaignPage() {
 
   const labelCls = "block text-sm font-medium text-zinc-300 mb-1.5";
 
+  const handleLaunch = async () => {
+    try {
+      setIsSubmitting(true);
+      let finalLink = form.contentLink;
+
+      if (form.uploadType === "file" && mediaFile) {
+        const supabase = createClient();
+        const fileExt = mediaFile.name.split('.').pop();
+        const filePath = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
+
+        const { error } = await supabase.storage
+          .from('campaign-media')
+          .upload(filePath, mediaFile);
+
+        if (error) throw error;
+
+        const { data } = supabase.storage
+          .from('campaign-media')
+          .getPublicUrl(filePath);
+
+        finalLink = data.publicUrl;
+      }
+
+      // TODO: Save campaign data and finalLink to database
+
+      router.push("/dashboard/creator/campaigns");
+    } catch (error) {
+      console.error("Upload failed:", error);
+      alert("Failed to upload media. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       <main className="flex-1 p-6 max-w-3xl mx-auto w-full">
-         <div className="opacity-0 h-0 overflow-hidden absolute">
+        <div className="opacity-0 h-0 overflow-hidden absolute">
           <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Create New Campaign</h1>
           <p className="text-zinc-400 text-sm">Launch your content distribution campaign in 4 steps</p>
         </div>
@@ -126,15 +172,113 @@ export default function CreateCampaignPage() {
                 className="space-y-5"
               >
                 <h2 className="text-lg font-semibold text-white mb-6">Content Details</h2>
-                <div>
-                  <label className={labelCls}>Content Link <span className="text-primary">*</span></label>
-                  <input
-                    className={inputCls}
-                    placeholder="https://youtube.com/watch?v=... or TikTok URL"
-                    value={form.contentLink}
-                    onChange={(e) => set("contentLink", e.target.value)}
-                  />
+
+                {/* Content Source Selection */}
+                <div className="space-y-3">
+                  <label className={labelCls}>Source <span className="text-primary">*</span></label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      onClick={() => set("uploadType", "link")}
+                      className={cn(
+                        "flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-medium border transition-all duration-200",
+                        form.uploadType !== "file"
+                          ? "bg-primary/15 border-primary/40 text-primary shadow-[inset_0_0_12px_rgba(255,79,0,0.1)]"
+                          : "bg-white/4 border-white/8 text-zinc-400 hover:bg-white/8 hover:text-white"
+                      )}
+                    >
+                      <Link2 size={16} />
+                      Paste Link
+                    </button>
+                    <button
+                      onClick={() => set("uploadType", "file")}
+                      className={cn(
+                        "flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-medium border transition-all duration-200",
+                        form.uploadType === "file"
+                          ? "bg-primary/15 border-primary/40 text-primary shadow-[inset_0_0_12px_rgba(255,79,0,0.1)]"
+                          : "bg-white/4 border-white/8 text-zinc-400 hover:bg-white/8 hover:text-white"
+                      )}
+                    >
+                      <UploadCloud size={16} />
+                      Upload Media
+                    </button>
+                  </div>
+
+                  <AnimatePresence mode="wait">
+                    {form.uploadType === "file" ? (
+                      <motion.div
+                        key="file-upload"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="overflow-hidden"
+                      >
+                        <div className={cn(
+                          "mt-2 border-2 border-dashed transition-colors bg-white/[0.02] rounded-xl p-8 flex flex-col items-center justify-center text-center cursor-pointer group relative",
+                          uploadError ? "border-rose-500/40 hover:border-rose-400" : "border-white/10 hover:border-primary/50"
+                        )}>
+                          <input
+                            type="file"
+                            accept="video/*,audio/*,image/*,.pdf,.doc,.docx"
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                if (file.size > 50 * 1024 * 1024) {
+                                  setUploadError("File is too large. Choose a media file under 50MB.");
+                                  e.target.value = ""; // Reset input
+                                  setMediaFile(null);
+                                  set("contentFileName", "");
+                                  return;
+                                }
+                                setUploadError(null);
+                                set("contentFileName", file.name);
+                                setMediaFile(file);
+                              }
+                            }}
+                          />
+                          <div className={cn(
+                            "w-12 h-12 rounded-full flex items-center justify-center mb-3 transition-colors",
+                            uploadError
+                              ? "bg-rose-500/10 text-rose-400"
+                              : "bg-white/5 group-hover:bg-primary/10 text-zinc-400 group-hover:text-primary"
+                          )}>
+                            {uploadError ? <AlertCircle size={20} /> : (form.contentFileName ? <FileText size={20} className="text-primary" /> : <UploadCloud size={20} />)}
+                          </div>
+                          <span className="text-sm font-medium text-white mb-1">
+                            {form.contentFileName ? form.contentFileName : "Click to upload or drag and drop"}
+                          </span>
+                          <span className={cn(
+                            "text-xs transition-colors",
+                            uploadError ? "text-rose-400 font-semibold" : "text-zinc-500"
+                          )}>
+                            {uploadError ? uploadError : (form.contentFileName ? "Click to change file" : "Video, Photo, Audio, or Doc (Up to 50MB)")}
+                          </span>
+                        </div>
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="link-input"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="mt-2 relative">
+                          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500">
+                            <Link2 size={16} />
+                          </div>
+                          <input
+                            className={cn(inputCls, "pl-11")}
+                            placeholder="https://youtube.com/watch?v=... or TikTok URL"
+                            value={form.contentLink}
+                            onChange={(e) => set("contentLink", e.target.value)}
+                          />
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
+
                 <div>
                   <label className={labelCls}>Campaign Title <span className="text-primary">*</span></label>
                   <input
@@ -315,10 +459,18 @@ export default function CreateCampaignPage() {
                 </div>
 
                 <Button
-                  onClick={() => router.push("/dashboard/creator/campaigns")}
-                  className="w-full h-12 bg-primary hover:bg-primary/90 text-white rounded-xl font-semibold text-base shadow-[0_0_30px_rgba(255,79,0,0.4)]"
+                  onClick={handleLaunch}
+                  disabled={isSubmitting}
+                  className="w-full h-12 bg-primary hover:bg-primary/90 text-white rounded-xl font-semibold text-base shadow-[0_0_30px_rgba(255,79,0,0.4)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                  Pay & Launch Campaign
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="animate-spin" size={18} />
+                      {form.uploadType === "file" ? "Uploading Media..." : "Launching Campaign..."}
+                    </>
+                  ) : (
+                    "Pay & Launch Campaign"
+                  )}
                 </Button>
               </motion.div>
             )}

@@ -14,6 +14,7 @@ import {
   LogOut,
   Shield,
   X,
+  Video
 } from "lucide-react";
 
 import { useEffect, useState } from "react";
@@ -26,6 +27,7 @@ const navItems = [
   { label: "Overview", href: "/dashboard/admin", icon: LayoutDashboard },
   { label: "Users", href: "/dashboard/admin/users", icon: Users },
   { label: "Campaigns", href: "/dashboard/admin/campaigns", icon: Megaphone },
+  { label: "Clips", href: "/dashboard/admin/clips", icon: Video },
   { label: "Disputes", href: "/dashboard/admin/disputes", icon: AlertTriangle },
   { label: "Finances", href: "/dashboard/admin/finances", icon: Wallet },
   { label: "Settings", href: "/dashboard/admin/settings", icon: Settings },
