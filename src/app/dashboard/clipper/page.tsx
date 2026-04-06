@@ -10,7 +10,7 @@ import { useTitle } from "@/lib/title-context";
 
 // Removed mock data
 const mockClipperCampaigns: any[] = [];
-const clipperStats = { activeCampaigns: 0, totalSpend: 0, totalImpressions: 0, averageCpm: 0, totalEarned: 0, totalClips: 0, balance: 0, pending: 0, successful: 0 } as any;
+const clipperStats = { activeCampaigns: 0, activeOffers: 0, totalSpend: 0, totalImpressions: 0, averageCpm: 0, totalEarned: 0, totalEarnings: 0, totalClips: 0, balance: 0, pending: 0, successful: 0, availableBalance: 0, pendingEarnings: 0, lifetimeEarnings: 0, walletBalance: 0, escrowBalance: 0 } as any; const creatorStats = { activeCampaigns: 0, activeOffers: 0, totalSpend: 0, totalImpressions: 0, averageCpm: 0, totalEarned: 0, totalEarnings: 0, totalClips: 0, balance: 0, pending: 0, successful: 0, availableBalance: 0, pendingEarnings: 0, lifetimeEarnings: 0, walletBalance: 0, escrowBalance: 0 } as any; const ClipStatus = { activeCampaigns: 0, activeOffers: 0, totalSpend: 0, totalImpressions: 0, averageCpm: 0, totalEarned: 0, totalEarnings: 0, totalClips: 0, balance: 0, pending: 0, successful: 0, availableBalance: 0, pendingEarnings: 0, lifetimeEarnings: 0, walletBalance: 0, escrowBalance: 0 } as any;
 
 
 export default function ClipperDashboard() {
