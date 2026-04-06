@@ -4,9 +4,13 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { StatusBadge } from "@/components/dashboard/shared/status-badge";
-import { mockCampaigns } from "@/lib/mock-data";
+
 import { PlusCircle, Eye, PauseCircle, PlusSquare } from "lucide-react";
 import { useTitle } from "@/lib/title-context";
+
+// Removed mock data
+const mockCampaigns: any[] = [];
+
 
 export default function MyCampaignsPage() {
   const router = useRouter();

@@ -118,7 +118,7 @@ function SignUpForm() {
       }
 
       if (data.user) {
-        router.push(`/dashboard/${role}`);
+        router.push(`/auth/welcome?role=${role}`);
       }
     } catch {
       setError("Something went wrong. Please try again.");

@@ -2,10 +2,14 @@
 
 import { motion } from "framer-motion";
 import { StatusBadge } from "@/components/dashboard/shared/status-badge";
-import { mockCreatorDisputes } from "@/lib/mock-data";
+
 import { AlertTriangle, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTitle } from "@/lib/title-context";
+
+// Removed mock data
+const mockCreatorDisputes: any[] = [];
+
 
 export default function CreatorDisputesPage() {
   useTitle("Disputes", "Report and track disputes with clippers");

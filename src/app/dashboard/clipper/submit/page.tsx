@@ -3,11 +3,16 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { StatusBadge } from "@/components/dashboard/shared/status-badge";
-import { mockClipperCampaigns, mockClipSubmissions } from "@/lib/mock-data";
+
 import { Button } from "@/components/ui/button";
 import { Send, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTitle } from "@/lib/title-context";
+
+// Removed mock data
+const mockClipperCampaigns: any[] = [];
+const mockClipSubmissions: any[] = [];
+
 
 const PLATFORMS = ["TikTok", "Instagram", "YouTube Shorts", "Twitter/X"];
 

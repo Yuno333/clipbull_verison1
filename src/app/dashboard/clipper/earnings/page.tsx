@@ -2,10 +2,15 @@
 
 import { motion } from "framer-motion";
 import { StatusBadge } from "@/components/dashboard/shared/status-badge";
-import { mockClipperTransactions, clipperStats } from "@/lib/mock-data";
+
 import { Wallet, TrendingUp, Clock, ArrowUpToLine } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTitle } from "@/lib/title-context";
+
+// Removed mock data
+const mockClipperTransactions: any[] = [];
+const clipperStats = { activeCampaigns: 0, totalSpend: 0, totalImpressions: 0, averageCpm: 0, totalEarned: 0, totalClips: 0, balance: 0, pending: 0, successful: 0 } as any;
+
 
 export default function EarningsPage() {
   useTitle("Earnings & Wallet", "Track your earnings and manage payouts");

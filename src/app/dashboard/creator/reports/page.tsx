@@ -2,10 +2,14 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { mockCampaigns } from "@/lib/mock-data";
+
 import { BarChart3, TrendingUp, Eye, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTitle } from "@/lib/title-context";
+
+// Removed mock data
+const mockCampaigns: any[] = [];
+
 
 export default function ReportsPage() {
   useTitle("Performance Reports", "Analyse your distribution campaign metrics");

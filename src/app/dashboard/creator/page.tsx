@@ -4,9 +4,14 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { KpiCard } from "@/components/dashboard/shared/kpi-card";
 import { StatusBadge } from "@/components/dashboard/shared/status-badge";
-import { mockCampaigns, creatorStats } from "@/lib/mock-data";
+
 import { Megaphone, DollarSign, TrendingUp, BarChart3, PlusCircle, ExternalLink } from "lucide-react";
 import { useTitle } from "@/lib/title-context";
+
+// Removed mock data
+const mockCampaigns: any[] = [];
+const creatorStats = { activeCampaigns: 0, totalSpend: 0, totalImpressions: 0, averageCpm: 0, totalEarned: 0, totalClips: 0, balance: 0, pending: 0, successful: 0 } as any;
+
 
 export default function CreatorDashboard() {
   useTitle("Dashboard", "Welcome back, Alex 👋");

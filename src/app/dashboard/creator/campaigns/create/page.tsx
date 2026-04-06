@@ -83,8 +83,8 @@ export default function CreateCampaignPage() {
       setIsSubmitting(true);
       let finalLink = form.contentLink;
 
+      const supabase = createClient();
       if (form.uploadType === "file" && mediaFile) {
-        const supabase = createClient();
         const fileExt = mediaFile.name.split('.').pop();
         const filePath = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
 
@@ -101,7 +101,26 @@ export default function CreateCampaignPage() {
         finalLink = data.publicUrl;
       }
 
-      // TODO: Save campaign data and finalLink to database
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error("Not authenticated");
+
+        const { error: dbError } = await supabase
+          .from('campaigns')
+          .insert({
+            creator_id: user.id,
+            title: form.title,
+            niche: form.niche,
+            content_link: finalLink,
+            description: form.description,
+            cpm: parseFloat(form.cpm) || 0,
+            budget: budget,
+            max_payout_per_clipper: form.maxPayoutPerClipper ? parseFloat(form.maxPayoutPerClipper) : null,
+            max_clippers: form.maxClippers ? parseInt(form.maxClippers) : null,
+            duration_days: form.durationDays ? parseInt(form.durationDays) : null,
+            status: "pending"
+          });
+
+        if (dbError) throw dbError;
 
       router.push("/dashboard/creator/campaigns");
     } catch (error) {

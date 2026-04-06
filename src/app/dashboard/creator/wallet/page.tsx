@@ -2,10 +2,15 @@
 
 import { motion } from "framer-motion";
 import { Wallet, ArrowDownToLine, Lock, RotateCcw } from "lucide-react";
-import { creatorStats, mockCreatorTransactions } from "@/lib/mock-data";
+
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/dashboard/shared/status-badge";
 import { useTitle } from "@/lib/title-context";
+
+// Removed mock data
+const creatorStats = { activeCampaigns: 0, totalSpend: 0, totalImpressions: 0, averageCpm: 0, totalEarned: 0, totalClips: 0, balance: 0, pending: 0, successful: 0 } as any;
+const mockCreatorTransactions: any[] = [];
+
 
 export default function WalletPage() {
   useTitle("Wallet & Payments", "Manage your balance and campaign funds");

@@ -3,9 +3,13 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { StatusBadge } from "@/components/dashboard/shared/status-badge";
-import { mockClipperCampaigns } from "@/lib/mock-data";
+
 import { Eye, Send } from "lucide-react";
 import { useTitle } from "@/lib/title-context";
+
+// Removed mock data
+const mockClipperCampaigns: any[] = [];
+
 
 export default function ClipperCampaignsPage() {
   useTitle("My Campaigns", "Campaigns you've joined and are actively clipping");

@@ -3,11 +3,15 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { StatusBadge } from "@/components/dashboard/shared/status-badge";
-import { mockClipperDisputes } from "@/lib/mock-data";
+
 import { AlertTriangle, Paperclip, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useTitle } from "@/lib/title-context";
+
+// Removed mock data
+const mockClipperDisputes: any[] = [];
+
 
 export default function ClipperDisputesPage() {
   const [appealText, setAppealText] = useState("");

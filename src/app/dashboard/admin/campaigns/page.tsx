@@ -1,26 +1,82 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Search, Megaphone, Eye, Pause, Play, CheckCircle, ExternalLink, Ban } from "lucide-react";
+import { Search, Megaphone, Eye, Pause, Play, CheckCircle, ExternalLink, Ban, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
-const mockCampaigns = [
-  { id: "1", name: "Summer Sale 2024", creator: "Alex Creator", budget: "₦500,000", spent: "₦120,000", clips: 12, impressions: "450K", status: "active", type: "CPC" },
-  { id: "2", name: "Product Launch: Pro Max", creator: "Emma Thompson", budget: "₦250,000", spent: "₦250,000", clips: 45, impressions: "2.1M", status: "completed", type: "CPM" },
-  { id: "3", name: "Back to School Promo", creator: "David Wilson", budget: "₦100,000", spent: "₦8,500", clips: 3, impressions: "12K", status: "active", type: "Fixed" },
-  { id: "4", name: "Brand Awareness HQ", creator: "Nike Official", budget: "₦1,000,000", spent: "₦450,000", clips: 89, impressions: "5.4M", status: "paused", type: "CPA" },
-];
-
+import { createClient } from "@/lib/supabase/client";
 import { useTitle } from "@/lib/title-context";
+
+interface AdmCampaign {
+  id: string;
+  name: string;
+  creator: string;
+  budget: number;
+  spent: number;
+  clips: number;
+  impressions: number;
+  status: string;
+}
 
 export default function CampaignsPage() {
   useTitle("Global Campaigns", "Monitor all active and historical campaigns across the platform.");
   const [search, setSearch] = useState("");
-  const [activeTab, setActiveTab] = useState<"all" | "active" | "paused" | "completed">("all");
+  const [activeTab, setActiveTab] = useState<"all" | "active" | "paused" | "completed" | "pending">("all");
+  const [campaigns, setCampaigns] = useState<AdmCampaign[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredCampaigns = mockCampaigns.filter(camp => {
+  const fetchCampaigns = async () => {
+    setLoading(true);
+    const supabase = createClient();
+    
+    // Fetch campaigns joined with profiles for creator name
+    const { data, error } = await supabase
+      .from('campaigns')
+      .select(`
+        id,
+        title,
+        budget,
+        spent,
+        impressions,
+        status,
+        profiles!creator_id ( username )
+      `)
+      .order('created_at', { ascending: false });
+
+    if (!error && data) {
+      const formatted = data.map((c: any) => ({
+        id: c.id,
+        name: c.title,
+        creator: c.profiles?.username || "Unknown",
+        budget: c.budget,
+        spent: c.spent,
+        clips: 0, // Placeholder
+        impressions: c.impressions,
+        status: c.status
+      }));
+      setCampaigns(formatted);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchCampaigns();
+  }, []);
+
+  const updateStatus = async (id: string, newStatus: string) => {
+    const supabase = createClient();
+    const { error } = await supabase
+      .from('campaigns')
+      .update({ status: newStatus })
+      .eq('id', id);
+
+    if (!error) {
+      setCampaigns(campaigns.map(c => c.id === id ? { ...c, status: newStatus } : c));
+    }
+  };
+
+  const filteredCampaigns = campaigns.filter(camp => {
     const matchesSearch = camp.name.toLowerCase().includes(search.toLowerCase()) || 
                          camp.creator.toLowerCase().includes(search.toLowerCase());
     const matchesTab = activeTab === "all" || camp.status === activeTab;
@@ -40,13 +96,13 @@ export default function CampaignsPage() {
             <p className="text-zinc-400 text-sm">Monitor all active and historical campaigns across the platform.</p>
           </div>
           <div className="flex items-center gap-3">
-             <div className="flex p-1 bg-white/[0.02] border border-white/[0.08] rounded-xl">
-              {(["all", "active", "paused", "completed"] as const).map((tab) => (
+             <div className="flex p-1 bg-white/[0.02] border border-white/[0.08] rounded-xl overflow-x-auto">
+              {(["all", "pending", "active", "paused", "completed"] as const).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={cn(
-                    "px-4 py-2 rounded-lg text-xs font-semibold capitalize transition-all",
+                    "px-4 py-2 rounded-lg text-xs font-semibold capitalize transition-all shrink-0",
                     activeTab === tab 
                       ? "bg-cyan-500 text-white shadow-lg shadow-cyan-500/20" 
                       : "text-zinc-500 hover:text-zinc-300"
@@ -73,7 +129,12 @@ export default function CampaignsPage() {
 
         {/* Campaigns Grid */}
         <div className="grid grid-cols-1 gap-4">
-          {filteredCampaigns.map((camp, i) => (
+          {loading ? (
+             <div className="py-16 text-center text-zinc-500">
+               <Loader2 size={32} className="animate-spin mx-auto mb-2" />
+               Loading campaigns...
+             </div>
+          ) : filteredCampaigns.map((camp, i) => (
             <motion.div 
               key={camp.id}
               initial={{ opacity: 0, x: -20 }}
@@ -94,6 +155,7 @@ export default function CampaignsPage() {
                     "text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-md",
                     camp.status === 'active' ? 'text-emerald-400 bg-emerald-500/10' : 
                     camp.status === 'paused' ? 'text-amber-400 bg-amber-500/10' : 
+                    camp.status === 'pending' ? 'text-blue-400 bg-blue-500/10' : 
                     'text-zinc-400 bg-white/5'
                   )}>
                     {camp.status}
@@ -103,11 +165,11 @@ export default function CampaignsPage() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-4">
                   <div>
                     <div className="text-[10px] uppercase tracking-wider text-zinc-600 font-bold mb-1">Budget</div>
-                    <div className="text-sm font-semibold text-white">{camp.budget}</div>
+                    <div className="text-sm font-semibold text-white">₦{camp.budget?.toLocaleString() || 0}</div>
                   </div>
                   <div>
                     <div className="text-[10px] uppercase tracking-wider text-zinc-600 font-bold mb-1">Spent</div>
-                    <div className="text-sm font-semibold text-zinc-300">{camp.spent}</div>
+                    <div className="text-sm font-semibold text-zinc-300">₦{camp.spent?.toLocaleString() || 0}</div>
                   </div>
                   <div>
                     <div className="text-[10px] uppercase tracking-wider text-zinc-600 font-bold mb-1">Clips</div>
@@ -124,12 +186,12 @@ export default function CampaignsPage() {
               <div className="lg:w-48">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-[10px] font-bold text-zinc-500 uppercase">Usage</span>
-                  <span className="text-xs font-bold text-white">45%</span>
+                  <span className="text-xs font-bold text-white">{camp.budget > 0 ? Math.round((camp.spent/camp.budget)*100) : 0}%</span>
                 </div>
                 <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
                   <motion.div 
                     initial={{ width: 0 }}
-                    animate={{ width: "45%" }}
+                    animate={{ width: `${camp.budget > 0 ? Math.round((camp.spent/camp.budget)*100) : 0}%` }}
                     className="h-full bg-cyan-500"
                   />
                 </div>
@@ -140,21 +202,37 @@ export default function CampaignsPage() {
                 <button className="flex-1 lg:flex-none p-2.5 rounded-xl bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10 transition-all border border-white/5">
                   <Eye size={18} />
                 </button>
-                {camp.status === 'active' ? (
-                  <button className="flex-1 lg:flex-none p-2.5 rounded-xl bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 transition-all border border-amber-500/10">
-                    <Pause size={18} />
-                  </button>
-                ) : (
-                  <button className="flex-1 lg:flex-none p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-all border border-emerald-500/10">
-                    <Play size={18} />
+
+                {camp.status === 'pending' && (
+                  <button onClick={() => updateStatus(camp.id, 'active')} className="flex-1 lg:flex-none p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-all border border-emerald-500/10">
+                    <CheckCircle size={18} />
                   </button>
                 )}
-                <button className="flex-1 lg:flex-none p-2.5 rounded-xl bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 transition-all border border-rose-500/10">
-                  <Ban size={18} />
-                </button>
+
+                {camp.status === 'active' ? (
+                  <button onClick={() => updateStatus(camp.id, 'paused')} className="flex-1 lg:flex-none p-2.5 rounded-xl bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 transition-all border border-amber-500/10">
+                    <Pause size={18} />
+                  </button>
+                ) : camp.status === 'paused' ? (
+                  <button onClick={() => updateStatus(camp.id, 'active')} className="flex-1 lg:flex-none p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-all border border-emerald-500/10">
+                    <Play size={18} />
+                  </button>
+                ) : null}
+
+                {camp.status !== 'rejected' && (
+                  <button onClick={() => updateStatus(camp.id, 'rejected')} className="flex-1 lg:flex-none p-2.5 rounded-xl bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 transition-all border border-rose-500/10">
+                    <Ban size={18} />
+                  </button>
+                )}
               </div>
             </motion.div>
           ))}
+
+          {!loading && filteredCampaigns.length === 0 && (
+             <div className="py-16 text-center text-zinc-600">
+               No campaigns found matching your criteria.
+             </div>
+          )}
         </div>
       </motion.div>
     </div>

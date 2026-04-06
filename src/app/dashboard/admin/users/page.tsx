@@ -1,27 +1,71 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Search, UserPlus, MoreVertical, Shield, ShieldAlert, UserCheck, Ban } from "lucide-react";
+import { Search, UserPlus, MoreVertical, UserCheck, Ban, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
-const mockUsers = [
-  { id: "1", name: "Alex Creator", email: "alex@creator.com", role: "creator", status: "active", joined: "2024-03-15" },
-  { id: "2", name: "Sarah Clipper", email: "sarah@clipper.com", role: "clipper", status: "active", joined: "2024-03-16" },
-  { id: "3", name: "Mike Johnson", email: "mike@example.com", role: "creator", status: "pending", joined: "2024-03-20" },
-  { id: "4", name: "David Wilson", email: "david@clipper.com", role: "clipper", status: "suspended", joined: "2024-02-10" },
-  { id: "5", name: "Emma Thompson", email: "emma@creator.com", role: "creator", status: "active", joined: "2024-03-22" },
-];
-
+import { createClient } from "@/lib/supabase/client";
 import { useTitle } from "@/lib/title-context";
+
+interface AdmUser {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  status: string;
+  joined: string;
+}
 
 export default function UsersPage() {
   useTitle("User Management", "Manage all creators and clippers on the platform.");
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState<"all" | "creator" | "clipper">("all");
+  const [users, setUsers] = useState<AdmUser[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredUsers = mockUsers.filter(user => {
+  const fetchUsers = async () => {
+    setLoading(true);
+    const supabase = createClient();
+    
+    // Note: To get emails, we would normally query auth.users, but we only have profiles accessible directly via PostgREST unless we have a secure admin view.
+    // Assuming profiles has enough info for now
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (!error && data) {
+      const formatted = data.map((u: any) => ({
+        id: u.id,
+        name: u.username || "Unknown",
+        email: "hidden@privacy.com", // In a real app we'd join auth.users via an admin RPC
+        role: u.role,
+        status: u.status,
+        joined: new Date(u.created_at).toISOString().split('T')[0]
+      }));
+      setUsers(formatted);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const updateUserStatus = async (id: string, newStatus: string) => {
+    const supabase = createClient();
+    const { error } = await supabase
+      .from('profiles')
+      .update({ status: newStatus })
+      .eq('id', id);
+
+    if (!error) {
+      setUsers(users.map(u => u.id === id ? { ...u, status: newStatus } : u));
+    }
+  };
+
+  const filteredUsers = users.filter(user => {
     const matchesSearch = user.name.toLowerCase().includes(search.toLowerCase()) || 
                          user.email.toLowerCase().includes(search.toLowerCase());
     const matchesTab = activeTab === "all" || user.role === activeTab;
@@ -89,7 +133,14 @@ export default function UsersPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/[0.04]">
-              {filteredUsers.map((user, i) => (
+              {loading ? (
+                <tr>
+                  <td colSpan={5} className="py-16 text-center text-zinc-500">
+                    <Loader2 size={32} className="animate-spin mx-auto mb-2" />
+                    Loading users...
+                  </td>
+                </tr>
+              ) : filteredUsers.map((user, i) => (
                 <motion.tr 
                   key={user.id}
                   initial={{ opacity: 0, y: 10 }}
@@ -138,12 +189,16 @@ export default function UsersPage() {
                   <td className="px-6 py-4 text-sm text-zinc-400">{user.joined}</td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-colors" title="Verify">
-                        <UserCheck size={16} />
-                      </button>
-                      <button className="p-2 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 transition-colors" title="Suspend">
-                        <Ban size={16} />
-                      </button>
+                      {user.status !== 'active' && (
+                        <button onClick={() => updateUserStatus(user.id, 'active')} className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-colors" title="Verify User">
+                          <UserCheck size={16} />
+                        </button>
+                      )}
+                      {user.status !== 'suspended' && (
+                        <button onClick={() => updateUserStatus(user.id, 'suspended')} className="p-2 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 transition-colors" title="Suspend User">
+                          <Ban size={16} />
+                        </button>
+                      )}
                       <button className="p-2 rounded-lg bg-white/5 text-zinc-400 hover:bg-white/10 transition-colors">
                         <MoreVertical size={16} />
                       </button>
@@ -153,7 +208,7 @@ export default function UsersPage() {
               ))}
             </tbody>
           </table>
-          {filteredUsers.length === 0 && (
+          {!loading && filteredUsers.length === 0 && (
             <div className="p-12 text-center">
               <div className="w-16 h-16 rounded-2xl bg-white/[0.02] border border-white/[0.06] flex items-center justify-center mx-auto mb-4">
                 <Search size={24} className="text-zinc-600" />

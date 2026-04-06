@@ -5,8 +5,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Search, CheckCircle, XCircle, AlertOctagon, LinkIcon, Video, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { mockClipSubmissions, ClipStatus } from "@/lib/mock-data";
+
 import { useTitle } from "@/lib/title-context";
+
+// Removed mock data
+const mockClipSubmissions: any[] = [];
+type ClipStatus = "Pending" | "Approved" | "Rejected";
+
 
 export default function ClipsReviewPage() {
   useTitle("Clips Review", "Review submitted clips, check performance, and manage approvals.");

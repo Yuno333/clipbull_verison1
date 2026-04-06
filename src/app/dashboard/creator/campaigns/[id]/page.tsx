@@ -5,10 +5,15 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { StatusBadge } from "@/components/dashboard/shared/status-badge";
-import { mockCampaigns, mockClipSubmissions } from "@/lib/mock-data";
+
 import { ArrowLeft, ExternalLink, PauseCircle, Flag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTitle } from "@/lib/title-context";
+
+// Removed mock data
+const mockCampaigns: any[] = [];
+const mockClipSubmissions: any[] = [];
+
 
 export default function CampaignDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
